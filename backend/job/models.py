@@ -1,10 +1,16 @@
+from codecs import latin_1_decode
 from datetime import timedelta
+from gettext import lngettext
+from math import lgamma
 from django.db import models
 from django.core.validators import MinValueValidator,MaxValueValidator
 from django.contrib.gis.db import models as gismodels
 from django.contrib.gis.geos import Point
 from datetime import *
 from django.contrib.auth.models import User
+
+import geocoder
+import os
 
 # Create your models here.
 
@@ -43,7 +49,7 @@ class Job(models.Model):
     address = models.CharField(max_length=100, null=True)
     jobType = models.CharField(
         max_length=10,
-        choice=JobType.choices,
+        choices=JobType.choices,
         default=JobType.Permanent
     )
     education = models.CharField(
@@ -52,12 +58,12 @@ class Job(models.Model):
             default=Education.Bachelors
     )
     industry = models.CharField(
-            max_length=10,
+            max_length=30,
             choices=Industry.choices,
             default=Industry.Business
     )
     experience = models.CharField(
-            max_length=10,
+            max_length=20,
             choices=Experience.choices,
             default=Experience.NO_EXPERIENCE
     )
@@ -69,3 +75,13 @@ class Job(models.Model):
     user=models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     createdAt = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+        g = geocoder.mapquest(self.address, key=os.environ.get('GEOCODER_API'))
+
+        print(g)
+
+        lng = g.lng
+        lat = g.lat
+
+        self.point = Point(lng, lat)
+        super(Job, self).save(*args, **kwargs)
