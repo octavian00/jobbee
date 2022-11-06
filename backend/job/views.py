@@ -82,8 +82,12 @@ def updateJob(request, pk):
     return Response(serializer.data)
 
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def deleteJob(request, pk):
     job = get_object_or_404(Job, id=pk)
+
+    if job.user != request.user:
+        return Response({'message': 'You cannot delete this job '}, status=status.HTTP_403_FORBIDDEN)
 
     job.delete()
 

@@ -65,3 +65,5 @@ def updateUser(request):
 
     serializer = UserSerializer(user, many=False)
     return Response(serializer.data)
+
+handler500 = 'rest_framework.exceptions.server_error'
