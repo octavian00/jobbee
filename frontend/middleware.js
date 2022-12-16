@@ -9,6 +9,7 @@ const allowedParams = [
     "salary",
     "jobType",
     "next",
+    "id",
 ]
 
 export async function middleware(req) {

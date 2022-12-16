@@ -10,6 +10,8 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [error, setError] = useState(null);
+    const [updated, setUpdated] = useState(null);
+    const [uploaded, setUploaded] = useState(null);
 
     const router = useRouter();
 
@@ -61,6 +63,66 @@ export const AuthProvider = ({ children }) => {
             if(res.data.message) {
                 setLoading(false);
                 router.push("/login");
+            }
+
+        } catch (error) {
+            setLoading(false);
+            setError(
+                error.response &&
+                    (error.response.data.detail || error.response.data.error)
+            );
+        }
+    };
+
+    // Update user
+    const updateProfile = async ({ firstName, lastName, email, password }, access_token) => {
+        try {
+            console.log(email);
+            setLoading(true);
+
+            const res = await axios.put(`${process.env.API_URL}/api/me/update/`, {
+                first_name: firstName,
+                last_name: lastName,
+                email,
+                password,
+            }, 
+            {
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                },
+            });
+            
+            if(res.data) {
+                setLoading(false);
+                setUpdated(true);
+                setUser(res.data);
+            }
+
+        } catch (error) {
+            setLoading(false);
+            setError(
+                error.response &&
+                    (error.response.data.detail || error.response.data.error)
+            );
+        }
+    };
+
+    // Upload Resume
+    const uploadResume = async (formData, access_token) => {
+        try {
+            setLoading(true);
+
+            const res = await axios.put(`${process.env.API_URL}/api/upload/resume/`,
+                formData,
+            {
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                },
+            });
+
+            if(res.data) {
+                setLoading(false);
+                setUploaded(true);
             }
 
         } catch (error) {
@@ -128,9 +190,15 @@ export const AuthProvider = ({ children }) => {
                 user,
                 error,
                 isAuthenticated,
+                updated,
+                uploaded,
                 login,
                 register,
+                updateProfile,
                 logout,
+                setUpdated,
+                setUploaded,
+                uploadResume,
                 clearErrors,
             }}
         >
