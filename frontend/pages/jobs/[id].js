@@ -23,7 +23,7 @@ export default function JobDetailsPage({
   );
 }
 
-export async function getServerSideProps({params }) {
+export async function getServerSideProps({req, params}) {
   try {
     const res = await axios.get(
       `${process.env.API_URL}/api/jobs/${params.id}/`
@@ -32,10 +32,13 @@ export async function getServerSideProps({params }) {
     const job = res.data.job;
     const candidates = res.data.candidates;
 
+    const access_token = req.cookies.access || '';
+
     return {
       props: {
         job,
         candidates,
+        access_token,
       },
     };
   } catch (error) {
