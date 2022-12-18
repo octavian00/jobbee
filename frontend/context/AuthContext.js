@@ -123,6 +123,7 @@ export const AuthProvider = ({ children }) => {
             if(res.data) {
                 setLoading(false);
                 setUploaded(true);
+                router.reload(window.location.pathname);
             }
 
         } catch (error) {

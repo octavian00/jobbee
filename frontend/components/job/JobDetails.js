@@ -1,15 +1,15 @@
 import React, { useEffect, useContext } from "react";
 import moment from "moment";
-import mapboxgl from 'mapbox-gl'
+//import mapboxgl from 'mapbox-gl'
 
 import JobContext from "../../context/JobContext";
 import { toast } from "react-toastify";
 
-mapboxgl.accessToken = process.env.MAPBOX_ACCESS_TOKEN;
+//mapboxgl.accessToken = process.env.MAPBOX_ACCESS_TOKEN;
 
 const JobDetails = ({ job, candidates, access_token }) => {
 
-  const{applyToJob, applied, clearErrors, error, loading, checkJobApplied} = useContext(JobContext)
+  const{applyToJob, applied, clearErrors, error, loading, checkJobApplied, isAuthenticated} = useContext(JobContext)
 
   useEffect(() => {
     //const cooridnates = job.point.split("(")[1].replace(")", "").split(" ");
@@ -30,8 +30,10 @@ const JobDetails = ({ job, candidates, access_token }) => {
       toast.error(error);
       clearErrors();
     }
-    checkJobApplied(job.id, access_token);
-  }, [error]);
+    if(isAuthenticated) {
+      checkJobApplied(job.id, access_token);
+    }
+  }, [error, isAuthenticated]);
 
   const applyToJobHandler = () => {
     applyToJob(job.id, access_token)
